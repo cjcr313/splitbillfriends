@@ -36,13 +36,13 @@ class HistoryScreen extends StatelessWidget {
                 final friendId = results.keys.elementAt(index);
                 final amount = results[friendId] ?? 0.0;
                 final friend = bill.friends.firstWhere((f) => f.id == friendId);
-                final initial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
+                final fallbackInitial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
 
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
                       backgroundColor: Theme.of(context).cardTheme.color,
-                      child: Text(initial, style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor))
+                      child: Text(friend.avatarUrl ?? fallbackInitial, style: friend.avatarUrl != null ? const TextStyle(fontSize: 20) : TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor))
                   ),
                   title: Text(friend.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                   trailing: Text(

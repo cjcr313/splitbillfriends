@@ -135,7 +135,7 @@ class SummaryScreen extends StatelessWidget {
                    double amount = results[friendId] ?? 0.0;
                    var friend = currentBill.friends.firstWhere((f) => f.id == friendId);
                    
-                   final initial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
+                   final fallbackInitial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
 
                    return Row(
                      children: [
@@ -143,8 +143,10 @@ class SummaryScreen extends StatelessWidget {
                          radius: 24,
                          backgroundColor: Theme.of(context).cardTheme.color,
                          child: Text(
-                           initial, 
-                           style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)
+                           friend.avatarUrl ?? fallbackInitial, 
+                           style: friend.avatarUrl != null
+                               ? const TextStyle(fontSize: 24)
+                               : TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)
                          ),
                        ),
                        const SizedBox(width: 16),

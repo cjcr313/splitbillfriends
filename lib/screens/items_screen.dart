@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/bill_provider.dart';
+import '../logic/ocr_service.dart';
 import 'summary_screen.dart';
 
 class ItemsScreen extends StatefulWidget {
@@ -13,6 +14,8 @@ class ItemsScreen extends StatefulWidget {
 class _ItemsScreenState extends State<ItemsScreen> {
   final _nameController = TextEditingController();
   final _priceController = TextEditingController();
+  final OcrService _ocrService = OcrService();
+  bool _isProcessingOcr = false;
   
   // Lista temporal para armar los seleccionados en el BottomSheet
   final Set<String> _selectedFriendIds = {};
@@ -87,6 +90,7 @@ class _ItemsScreenState extends State<ItemsScreen> {
                         selected: isSelected,
                         selectedColor: primaryColor.withValues(alpha: 0.2),
                         checkmarkColor: primaryColor,
+                        avatar: f.avatarUrl != null ? Text(f.avatarUrl!, style: const TextStyle(fontSize: 16)) : null,
                         label: Text(f.name),
                         onSelected: (bool selected) {
                           setSheetState(() {
@@ -163,6 +167,150 @@ class _ItemsScreenState extends State<ItemsScreen> {
               child: const Text('Guardar'),
             )
           ],
+        );
+      }
+    );
+  }
+
+  void _processOcr(BuildContext context, bool fromCamera) async {
+    setState(() => _isProcessingOcr = true);
+    
+    try {
+      final items = fromCamera 
+         ? await _ocrService.scanReceiptFromCamera() 
+         : await _ocrService.scanReceiptFromGallery();
+         
+      if (items.isNotEmpty && context.mounted) {
+         _showOcrReviewDialog(context, items);
+      } else if (context.mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se encontraron artículos')));
+      }
+    } catch(e) {
+      if (context.mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al procesar: $e')));
+      }
+    } finally {
+      if(mounted) setState(() => _isProcessingOcr = false);
+    }
+  }
+
+  void _showOcrReviewDialog(BuildContext context, List<ScannedItem> scannedItems) {
+    final billProvider = Provider.of<BillProvider>(context, listen: false);
+    List<bool> selected = List.filled(scannedItems.length, true);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateBuilder) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: const Text('Magia Completada 🪄', style: TextStyle(fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: double.maxFinite,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('He encontrado estos productos. Marca los que desees importar:'),
+                    const SizedBox(height: 8),
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: scannedItems.length,
+                        itemBuilder: (context, index) {
+                          final item = scannedItems[index];
+                          return CheckboxListTile(
+                            value: selected[index],
+                            title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            subtitle: Text('\$${item.price.toStringAsFixed(0)}'),
+                            activeColor: Theme.of(context).primaryColor,
+                            onChanged: (val) {
+                              setStateBuilder(() {
+                                selected[index] = val ?? false;
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+                ElevatedButton(
+                  onPressed: () {
+                    for (int i=0; i<scannedItems.length; i++) {
+                       if (selected[i]) {
+                          billProvider.addItem(scannedItems[i].name, scannedItems[i].price, []);
+                       }
+                    }
+                    Navigator.pop(ctx);
+                  },
+                  child: const Text('Añadir y Terminar'),
+                )
+              ],
+            );
+          }
+        );
+      }
+    );
+  }
+
+  void _showAddMethodDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              const Text('¿Cómo deseas ingresar el artículo?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Theme.of(context).primaryColor.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: Icon(Icons.edit, color: Theme.of(context).primaryColor),
+                ),
+                title: const Text('Escribir Manualmente', style: TextStyle(fontWeight: FontWeight.w600)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _showAddItemSheet(context);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.purpleAccent.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.camera_alt, color: Colors.purpleAccent),
+                ),
+                title: const Text('Escanear con Cámara (IA)', style: TextStyle(fontWeight: FontWeight.w600)),
+                subtitle: const Text('Extracción automática de precios'),
+                trailing: const Icon(Icons.auto_awesome, color: Colors.amber, size: 16),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _processOcr(context, true);
+                },
+              ),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.blueAccent.withValues(alpha: 0.1), shape: BoxShape.circle),
+                  child: const Icon(Icons.image, color: Colors.blueAccent),
+                ),
+                title: const Text('Subir desde Galería', style: TextStyle(fontWeight: FontWeight.w600)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _processOcr(context, false);
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         );
       }
     );
@@ -271,8 +419,10 @@ class _ItemsScreenState extends State<ItemsScreen> {
         children: [
           FloatingActionButton(
             heroTag: 'addItemBtn',
-            onPressed: () => _showAddItemSheet(context),
-            child: const Icon(Icons.add),
+            onPressed: () => _showAddMethodDialog(context),
+            child: _isProcessingOcr 
+                ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                : const Icon(Icons.add),
           ),
           const SizedBox(height: 16),
           if (items.isNotEmpty)

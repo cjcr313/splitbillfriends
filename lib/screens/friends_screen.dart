@@ -121,7 +121,7 @@ class _FriendsScreenState extends State<FriendsScreen> {
                         itemCount: friends.length,
                         itemBuilder: (context, index) {
                           final friend = friends[index];
-                          final initial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
+                          final fallbackInitial = friend.name.isNotEmpty ? friend.name[0].toUpperCase() : '?';
                           final dynamicColor = _getRandomAvatarColor(friend.id);
 
                           return Column(
@@ -133,12 +133,14 @@ class _FriendsScreenState extends State<FriendsScreen> {
                                     radius: 35,
                                     backgroundColor: dynamicColor.withValues(alpha: 0.15),
                                     child: Text(
-                                      initial,
-                                      style: TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                        color: dynamicColor,
-                                      ),
+                                      friend.avatarUrl ?? fallbackInitial,
+                                      style: friend.avatarUrl != null 
+                                          ? const TextStyle(fontSize: 32)
+                                          : TextStyle(
+                                              fontSize: 28,
+                                              fontWeight: FontWeight.bold,
+                                              color: dynamicColor,
+                                            ),
                                     ),
                                   ),
                                   // El mini botoncito 'X' para eliminar por error
