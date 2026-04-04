@@ -1,0 +1,38 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Permite ejecutar el botón mágicamente a mano desde Github
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar Repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Entorno Java (Baterías de Android)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17' # Requerido por Gradle moderno
+
+      - name: Instalar Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Descargar Dependencias
+        run: flutter pub get
+
+      - name: Compilar Archivo APK
+        run: flutter build apk --release
+
+      - name: Subir el Instalador a la Pestaña
+        uses: actions/upload-artifact@v4
+        with:
+          name: SplitBillFriends-Instalador-Android
+          path: build/app/outputs/flutter-apk/app-release.apk
