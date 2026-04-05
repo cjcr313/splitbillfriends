@@ -30,7 +30,8 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SplitBillFriends'),
+        title: const Text('Kunpapp'),
+        centerTitle: true,
         actions: [
           // Botón del Historial
           IconButton(
