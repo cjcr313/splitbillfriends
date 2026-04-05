@@ -1,39 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Inyección de Providers y Pantallas
 import 'providers/theme_provider.dart';
 import 'providers/bill_provider.dart';
 import 'providers/history_provider.dart';
-import 'screens/home_screen.dart';
+import 'screens/splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  
   runApp(
-    // 1. Envolvemos la App entera en un MultiProvider
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
-        ChangeNotifierProvider(create: (_) => BillProvider()),
-        ChangeNotifierProvider(create: (_) => HistoryProvider()), // Nuevo Gestor de Base de Datos
+        ChangeNotifierProvider(create: (_) => ThemeProvider(prefs)),
+        ChangeNotifierProvider(create: (_) => BillProvider(prefs)),
+        ChangeNotifierProvider(create: (_) => HistoryProvider()),
       ],
-      child: const SplitBillApp(),
+      child: const KunpappApp(),
     ),
   );
 }
 
-class SplitBillApp extends StatelessWidget {
-  const SplitBillApp({super.key});
+class KunpappApp extends StatelessWidget {
+  const KunpappApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // 2. Escuchamos al ThemeProvider para redibujar la app si cambia el tema
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      title: 'SplitBillFriends',
+      title: 'Kunpapp',
       debugShowCheckedModeBanner: false, // Desactiva la etiqueta 'DEBUG' fea de arriba
       theme: themeProvider.currentThemeData, // Se inyecta la Data actual (Claro, Oscuro, Neon)
-      home: const HomeScreen(), // La ruta inicial
+      home: const SplashScreen(), // La ruta inicial
     );
   }
 }
