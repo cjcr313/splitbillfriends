@@ -6,10 +6,12 @@ import '../models/item.dart';
 import '../models/currency.dart';
 
 class BillProvider extends ChangeNotifier {
-  static const List<String> _animalAvatars = [
-    '🐶', '🐱', '🦓', '🐘', '🐬', '🐧', '🦊', '🐸', '🐭', '🦁', 
-    '🐯', '🐻', '🐼', '🐨', '🐷', '🐰', '🐙', '🐢', '🦉', '🦄'
-  ];
+  static const Map<String, String> _animalMap = {
+    '🐶': 'Perro', '🐱': 'Gato', '🦓': 'Cebra', '🐘': 'Elefante', '🐬': 'Delfín',
+    '🐧': 'Pingüino', '🦊': 'Zorro', '🐸': 'Rana', '🐭': 'Ratón', '🦁': 'León',
+    '🐯': 'Tigre', '🐻': 'Oso', '🐼': 'Panda', '🐨': 'Koala', '🐷': 'Cerdo',
+    '🐰': 'Conejo', '🐙': 'Pulpo', '🐢': 'Tortuga', '🦉': 'Búho', '🦄': 'Unicornio'
+  };
 
   Bill? _currentBill;
 
@@ -29,21 +31,30 @@ class BillProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addFriend(String name) {
-    if (_currentBill == null || name.trim().isEmpty) return;
+  void addFriend([String? name]) {
+    if (_currentBill == null) return;
     
+    String finalName = (name != null) ? name.trim() : '';
+    if (finalName.isEmpty && name != null && name.trim().isNotEmpty) return; // Validación original adaptada
+
     String avatar = '🤷';
+    final avatarsList = _animalMap.keys.toList();
     final currentAvatars = _currentBill!.friends.map((f) => f.avatarUrl).toSet();
-    final availableAvatars = _animalAvatars.where((a) => !currentAvatars.contains(a)).toList();
+    final availableAvatars = avatarsList.where((a) => !currentAvatars.contains(a)).toList();
+    
     if (availableAvatars.isNotEmpty) {
       avatar = availableAvatars[Random().nextInt(availableAvatars.length)];
     } else {
-       avatar = _animalAvatars[Random().nextInt(_animalAvatars.length)];
+       avatar = avatarsList[Random().nextInt(avatarsList.length)];
+    }
+
+    if (finalName.isEmpty) {
+      finalName = _animalMap[avatar] ?? 'Amig@';
     }
 
     final newFriend = Friend(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      name: name.trim(),
+      name: finalName,
       avatarUrl: avatar,
     );
     

@@ -51,24 +51,36 @@ class _FriendsScreenState extends State<FriendsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // 1. Chip rápido que me sugeriste ("Añadirme a mí")
-              AnimatedSize(
-                duration: const Duration(milliseconds: 300),
-                child: !hasMe 
-                  ? Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
-                        child: ActionChip(
-                          avatar: const Icon(Icons.person, size: 16),
-                          label: const Text('Agregarme a mí (Yo)'),
-                          onPressed: _addMe,
-                          backgroundColor: accentColor.withValues(alpha: 0.1),
-                          side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
-                        ),
-                      ),
-                    )
-                  : const SizedBox.shrink(),
+              // 1. Chips rápidos (Añadir yo, Añadir amigo anónimo)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Wrap(
+                  spacing: 12.0,
+                  children: [
+                    AnimatedSize(
+                      duration: const Duration(milliseconds: 300),
+                      child: !hasMe 
+                        ? ActionChip(
+                            avatar: const Icon(Icons.person, size: 16),
+                            label: const Text('Yo'),
+                            onPressed: _addMe,
+                            backgroundColor: accentColor.withValues(alpha: 0.1),
+                            side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
+                          )
+                        : const SizedBox.shrink(),
+                    ),
+                    ActionChip(
+                      avatar: const Icon(Icons.pets, size: 16),
+                      label: const Text('Amig@ Rápido'),
+                      onPressed: () {
+                        // Al enviarlo vacío, el Provider le asignará el nombre del animal automáticamente
+                        Provider.of<BillProvider>(context, listen: false).addFriend();
+                      },
+                      backgroundColor: accentColor.withValues(alpha: 0.1),
+                      side: BorderSide(color: accentColor.withValues(alpha: 0.5)),
+                    ),
+                  ],
+                ),
               ),
 
               // 2. Campo input principal con su botón
