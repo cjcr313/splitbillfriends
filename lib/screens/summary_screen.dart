@@ -66,7 +66,7 @@ class SummaryScreen extends StatelessWidget {
 
   void _executeShare(Bill currentBill, Map<String, double> results) {
      StringBuffer sb = StringBuffer();
-     sb.writeln('🧾 **Kunpapp**');
+     sb.writeln('🧾 **Kumpa**');
      sb.writeln('Total mesa: ${currentBill.currency.symbol}${currentBill.total.toStringAsFixed(currentBill.currency.decimalPlaces)}');
      sb.writeln('---');
      
@@ -77,7 +77,7 @@ class SummaryScreen extends StatelessWidget {
         }
      });
      sb.writeln('---');
-     sb.writeln('¡Gracias por usar Kunpapp! 💸');
+     sb.writeln('¡Gracias por usar Kumpa! 💸');
      
      // ignore: deprecated_member_use
      Share.share(sb.toString());

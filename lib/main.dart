@@ -19,20 +19,20 @@ void main() async {
         ChangeNotifierProvider(create: (_) => BillProvider()),
         ChangeNotifierProvider(create: (_) => HistoryProvider()),
       ],
-      child: const KunpappApp(),
+      child: const KumpaApp(),
     ),
   );
 }
 
-class KunpappApp extends StatelessWidget {
-  const KunpappApp({super.key});
+class KumpaApp extends StatelessWidget {
+  const KumpaApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp(
-      title: 'Kunpapp',
+      title: 'Kumpa',
       debugShowCheckedModeBanner: false, // Desactiva la etiqueta 'DEBUG' fea de arriba
       theme: themeProvider.currentThemeData, // Se inyecta la Data actual (Claro, Oscuro, Neon)
       home: const SplashScreen(), // La ruta inicial

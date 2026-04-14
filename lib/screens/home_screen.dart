@@ -30,7 +30,7 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kunpapp'),
+        title: const Text('Kumpa'),
         centerTitle: true,
         actions: [
           // Botón del Historial

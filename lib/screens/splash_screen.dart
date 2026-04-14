@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    const String text = "KUNPAPP";
+    const String text = "KUMPA";
     const TextStyle textStyle = TextStyle(
       fontSize: 52,
       fontWeight: FontWeight.w900,
