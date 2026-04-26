@@ -6,7 +6,7 @@ import '../providers/history_provider.dart';
 import '../theme/app_theme.dart';
 import 'friends_screen.dart';
 import 'history_screen.dart';
-
+import 'about_screen.dart';
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -40,6 +40,14 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const HistoryScreen()));
             },
             tooltip: 'Ver Historial',
+          ),
+          // Botón Acerca de
+          IconButton(
+            icon: const Icon(Icons.info_outline_rounded),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
+            },
+            tooltip: 'Acerca de',
           ),
           // Botón para ciclar entre Claro, Oscuro y Neón
           IconButton(
