@@ -31,8 +31,13 @@ jobs:
       - name: Build App Bundle
         run: flutter build appbundle --release
 
-      - name: Upload App Bundle artifact
+      - name: Build APK for Verification
+        run: flutter build apk --release
+
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: splitbillfriends-aab
-          path: build/app/outputs/bundle/release/app-release.aab
+          name: splitbillfriends-release-files
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/flutter-apk/app-release.apk
