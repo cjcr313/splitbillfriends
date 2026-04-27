@@ -28,11 +28,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release
+      - name: Build App Bundle
+        run: flutter build appbundle --release
 
-      - name: Upload APK artifact
+      - name: Upload App Bundle artifact
         uses: actions/upload-artifact@v4
         with:
-          name: splitbillfriends-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          name: splitbillfriends-aab
+          path: build/app/outputs/bundle/release/app-release.aab
