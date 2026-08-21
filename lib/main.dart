@@ -10,7 +10,7 @@ import 'screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
+  await SharedPreferences.getInstance();
   
   runApp(
     MultiProvider(

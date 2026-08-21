@@ -33,7 +33,7 @@ android {
         applicationId = "com.nautalab.kumpa"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 21 // Requerido por Google ML Kit
+        minSdk = flutter.minSdkVersion // Requerido por Google ML Kit
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
